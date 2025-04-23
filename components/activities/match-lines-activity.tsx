@@ -224,7 +224,7 @@ export default function MatchLinesActivity({
       }
     })
 
-    return Math.round(correctMatches / totalPairs) * 100)
+    return Math.round(correctMatches / totalPairs) * 100
   }
 
   const handleSubmit = async () => {
@@ -249,6 +249,7 @@ export default function MatchLinesActivity({
         isCompleted: true,
         score: newScore,
         answers: JSON.stringify(userMatches),
+        timeSpent: 0,
       })
 
       if (!result.success) throw new Error(result.error || "Failed to save progress")

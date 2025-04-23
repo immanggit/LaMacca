@@ -69,8 +69,8 @@
     "jspdf-autotable": "latest",
     "react-chartjs-2": "latest",
     "@tanstack/react-table": "latest",
-    "@supabase/ssr": "latest",
-    "uuid": "latest"
+    "uuid": "latest",
+    "@supabase/ssr": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",

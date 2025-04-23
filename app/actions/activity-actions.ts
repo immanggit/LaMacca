@@ -66,7 +66,7 @@ export async function saveActivityProgress({
           completed: isCompleted,
           score: score,
           answers: answersString,
-          time_spent: existingProgress.time_spent + _timeSpent
+          time_spent: existingProgress.time_spent + _timeSpent,
           updated_at: new Date().toISOString(),
         })
         .eq("id", existingProgress.id)
