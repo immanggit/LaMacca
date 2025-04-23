@@ -1,0 +1,63 @@
+import { createServerClient as createServerClientSupabase } from "@supabase/ssr"
+import { cookies } from "next/headers"
+
+export const createClient = () => {
+  const cookieStore = cookies()
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://knyyalrduzqekgjzgvwe.supabase.co"
+  const supabaseKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtueXlhbHJkdXpxZWtnanpndndlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNzE2MzIsImV4cCI6MjA1ODg0NzYzMn0.4s0INweA9zQ6iJGZsnnkyoRK48nHGrnviso64ap46NQ"
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.error(
+      "Supabase URL and Anon Key are required! Please check your environment variables:" +
+        "NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be defined.",
+    )
+    // Return a dummy client that will fail gracefully
+    // This prevents the app from crashing immediately on the server
+    return {
+      auth: {
+        getSession: () => Promise.resolve({ data: { session: null } }),
+        getUser: () => Promise.resolve({ data: { user: null } }),
+        signInWithPassword: () => Promise.reject(new Error("Supabase client not properly initialized")),
+        signUp: () => Promise.reject(new Error("Supabase client not properly initialized")),
+        signOut: () => Promise.resolve({ error: null }),
+      },
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            single: () => Promise.resolve({ data: null, error: new Error("Supabase client not properly initialized") }),
+          }),
+        }),
+      }),
+    } as any
+  }
+
+  return createServerClientSupabase(supabaseUrl, supabaseKey, {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value
+      },
+      set(name: string, value: string, options: any) {
+        try {
+          cookies().set({ name, value, ...options })
+        } catch (e) {
+          // The `set` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing
+          // the user's session.
+        }
+      },
+      remove(name: string, options: any) {
+        try {
+          cookies().set({ name, value: "", ...options })
+        } catch (e) {
+          // The `delete` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing
+          // the user's session.
+        }
+      },
+    },
+  })
+}
+
+export const createServerClient = createClient
